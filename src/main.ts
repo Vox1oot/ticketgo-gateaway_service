@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 
+import { setupSwagger } from './config/swagger/swagger.config'
 import { AppModule } from './module/app.module'
 
 async function bootstrap() {
@@ -15,12 +16,14 @@ async function bootstrap() {
 		credentials: true
 	})
 
+	setupSwagger(app)
+
 	const port = config.getOrThrow<number>('HTTP_PORT')
 	const host = config.getOrThrow<string>('HTTP_HOST')
 
 	await app.listen(port)
 
-	logger.log(`Gateway service is running on http://${host}`)
-	logger.log(`Swagger UI is available at http://${host}/docs`)
+	logger.log(`Gateway service is running on ${host}`)
+	logger.log(`Swagger UI is available at ${host}/api/docs`)
 }
 bootstrap()
