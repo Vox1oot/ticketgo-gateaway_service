@@ -1,8 +1,11 @@
-import { Logger } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 
+import { getAppConfig } from './config/app/app.config'
+import { getCorsConfig } from './config/cors/cors.config'
 import { setupSwagger } from './config/swagger/swagger.config'
+import { getValidationPipeConfig } from './config/validation-pipe/validation-pipe.config'
 import { AppModule } from './module/app.module'
 
 async function bootstrap() {
@@ -11,15 +14,12 @@ async function bootstrap() {
 	const config = app.get(ConfigService)
 	const logger = new Logger()
 
-	app.enableCors({
-		origin: config.getOrThrow<string>('HTTP_CORS').split(','),
-		credentials: true
-	})
+	app.useGlobalPipes(new ValidationPipe(getValidationPipeConfig()))
+	app.enableCors(getCorsConfig(config))
 
 	setupSwagger(app)
 
-	const port = config.getOrThrow<number>('HTTP_PORT')
-	const host = config.getOrThrow<string>('HTTP_HOST')
+	const { port, host } = getAppConfig(config)
 
 	await app.listen(port)
 
