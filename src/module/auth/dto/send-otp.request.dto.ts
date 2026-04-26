@@ -1,9 +1,11 @@
-import { IsEnum, IsString } from 'class-validator'
+import { IsEnum, IsString, Validate } from 'class-validator'
+import { IdentifierValidator } from 'src/shared/validators/identifier.lvalidator'
 
 export class SendOtpRequestDto {
 	@IsString()
-	public identifier: string
+	@Validate(IdentifierValidator)
+	public identifier!: string
 
 	@IsEnum(['email', 'phone'])
-	public type: 'email' | 'phone'
+	public type!: 'email' | 'phone'
 }
